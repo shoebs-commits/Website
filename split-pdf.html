@@ -1,0 +1,577 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Extract selected pages from a PDF using PDFKit.">
+  <title>Split PDF — PDFKit</title>
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    .tool-main {
+      max-width: 1000px;
+      margin: auto;
+      padding: 40px;
+    }
+
+    .tool-intro {
+      margin-bottom: 28px;
+    }
+
+    .tool-intro h1 {
+      font-size: 34px;
+      margin: 10px 0;
+    }
+
+    .tool-intro p {
+      color: #777d91;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .converter-card {
+      max-width: 750px;
+      background: white;
+      border: 1px solid #eceef4;
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 12px 34px rgba(31,37,72,.055);
+    }
+
+    .drop-zone {
+      display: grid;
+      place-items: center;
+      min-height: 210px;
+      padding: 25px;
+      border: 2px dashed #c9c5f5;
+      border-radius: 12px;
+      background: #faf9ff;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .drop-zone.dragover {
+      background: #f0eeff;
+      border-color: #6558e8;
+    }
+
+    .upload-symbol {
+      font-size: 30px;
+      color: #6558e8;
+      margin-bottom: 10px;
+    }
+
+    .drop-zone strong {
+      font-size: 15px;
+    }
+
+    .drop-zone p {
+      color: #858a9b;
+      font-size: 12px;
+    }
+
+    .browse-button {
+      display: inline-block;
+      border: none;
+      border-radius: 8px;
+      background: #6558e8;
+      color: white;
+      padding: 12px 18px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    #pdfInput {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+    }
+
+    .file-info {
+      display: none;
+      margin-top: 20px;
+      padding: 15px;
+      border: 1px solid #eceef4;
+      border-radius: 9px;
+      background: #fafaff;
+      font-size: 12px;
+      color: #44495c;
+    }
+
+    .file-info.visible {
+      display: block;
+    }
+
+    .file-info strong {
+      display: block;
+      margin-bottom: 5px;
+      overflow-wrap: anywhere;
+    }
+
+    .field-label {
+      display: block;
+      margin: 22px 0 8px;
+      color: #34384b;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .pages-input {
+      width: 100%;
+      box-sizing: border-box;
+      min-height: 46px;
+      padding: 12px;
+      border: 1px solid #dfe1eb;
+      border-radius: 8px;
+      outline: none;
+      font: inherit;
+      font-size: 13px;
+    }
+
+    .pages-input:focus {
+      border-color: #6558e8;
+      box-shadow: 0 0 0 3px #6558e81c;
+    }
+
+    .input-help {
+      margin-top: 8px;
+      color: #8b90a0;
+      font-size: 11px;
+      line-height: 1.6;
+    }
+
+    .split-button {
+      margin-top: 22px;
+      min-height: 44px;
+      padding: 0 22px;
+      border: none;
+      border-radius: 8px;
+      background: #6558e8;
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .split-button:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    .message {
+      display: none;
+      margin-top: 18px;
+      padding: 13px;
+      border-radius: 8px;
+      font-size: 13px;
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+    }
+
+    .message.visible {
+      display: block;
+    }
+
+    .message.error {
+      background: #fff1f2;
+      color: #a63f4a;
+    }
+
+    .message.success {
+      background: #edfaf5;
+      color: #137c5b;
+    }
+
+    .download-link {
+      display: inline-block;
+      margin-left: 8px;
+      color: inherit;
+      font-weight: 700;
+    }
+
+    @media(max-width: 700px) {
+      .tool-main {
+        padding: 25px 18px;
+      }
+
+      .converter-card {
+        padding: 17px;
+      }
+
+      .tool-intro h1 {
+        font-size: 28px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+<div class="app-shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+
+    <a class="brand" href="index.html">
+      <span class="brand-mark">▤</span>
+      <span>PDF<span class="brand-accent">Kit</span></span>
+    </a>
+
+    <div class="side-label">WORKSPACE</div>
+
+    <nav class="side-nav">
+      <a class="nav-item" href="index.html">⌂ Overview</a>
+      <a class="nav-item" href="index.html#tools">▦ All PDF tools</a>
+      <a class="nav-item" href="index.html#history">◷ Recent activity</a>
+    </nav>
+
+    <div class="side-label side-label-tools">YOUR TOOLS</div>
+
+    <nav class="side-nav">
+      <a class="nav-item" href="image-to-pdf.html">▧ Image to PDF</a>
+      <a class="nav-item" href="merge-pdf.html">▤ Merge PDF</a>
+      <a class="nav-item active" href="split-pdf.html">⫶ Split PDF</a>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <div class="sidebar-foot">
+        <span class="status-dot"></span> PDFKit workspace
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+
+    <header class="topbar">
+      <button
+        class="mobile-menu"
+        id="menuToggle"
+        aria-label="Toggle navigation"
+        aria-expanded="false"
+      >☰</button>
+
+      <div class="breadcrumb">
+        Workspace <span>/</span> <strong>Split PDF</strong>
+      </div>
+    </header>
+
+    <div class="tool-main">
+
+      <section class="tool-intro">
+        <div class="side-label">PDF MANAGEMENT</div>
+
+        <h1>Extract PDF pages.</h1>
+
+        <p>
+          Select a PDF document and specify the page numbers or page
+          ranges you want to extract. PDFKit will create a new PDF
+          containing only those pages.
+        </p>
+      </section>
+
+      <section class="converter-card">
+
+        <!-- FILE UPLOAD -->
+        <label class="drop-zone" id="dropZone" for="pdfInput">
+          <div>
+            <div class="upload-symbol">↑</div>
+
+            <strong>Drop your PDF file here</strong>
+
+            <p>or choose a document from your computer</p>
+
+            <span class="browse-button">Browse PDF file</span>
+
+            <p>PDF only · Maximum 20 MB</p>
+          </div>
+        </label>
+
+        <input
+          type="file"
+          id="pdfInput"
+          accept=".pdf,application/pdf"
+        >
+
+        <!-- SELECTED FILE -->
+        <div class="file-info" id="fileInfo">
+          <strong id="fileName"></strong>
+          <span id="fileSize"></span>
+        </div>
+
+        <!-- PAGE SELECTION -->
+        <label class="field-label" for="pagesInput">
+          Pages to extract
+        </label>
+
+        <input
+          type="text"
+          class="pages-input"
+          id="pagesInput"
+          placeholder="Example: 1, 3, 5-8"
+          autocomplete="off"
+        >
+
+        <div class="input-help">
+          Enter individual page numbers separated by commas,
+          or use ranges with a hyphen.<br>
+          Example: <strong>1, 3, 5-8</strong> extracts pages
+          1, 3, 5, 6, 7 and 8.
+        </div>
+
+        <button
+          type="button"
+          class="split-button"
+          id="splitButton"
+          disabled
+        >
+          Extract Pages →
+        </button>
+
+        <div
+          class="message"
+          id="message"
+          role="status"
+          aria-live="polite"
+        ></div>
+
+      </section>
+    </div>
+  </main>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  const API_BASE = "http://127.0.0.1:8000";
+
+  const input = document.getElementById("pdfInput");
+  const dropZone = document.getElementById("dropZone");
+  const fileInfo = document.getElementById("fileInfo");
+  const fileName = document.getElementById("fileName");
+  const fileSize = document.getElementById("fileSize");
+  const pagesInput = document.getElementById("pagesInput");
+  const splitButton = document.getElementById("splitButton");
+  const message = document.getElementById("message");
+
+  let selectedFile = null;
+
+  // --------------------------------
+  // DISPLAY MESSAGE
+  // --------------------------------
+
+  function showMessage(text, type) {
+    message.className = `message visible ${type}`;
+    message.textContent = text;
+  }
+
+  // --------------------------------
+  // SELECT PDF
+  // --------------------------------
+
+  function selectFile(file) {
+    if (!file) return;
+
+    const isPdf =
+      file.name.toLowerCase().endsWith(".pdf") &&
+      (
+        file.type === "application/pdf" ||
+        file.type === ""
+      );
+
+    if (!isPdf) {
+      showMessage("Please select a valid PDF file.", "error");
+      return;
+    }
+
+    if (file.size > 20 * 1024 * 1024) {
+      showMessage(
+        "The PDF exceeds the 20 MB file size limit.",
+        "error"
+      );
+      return;
+    }
+
+    selectedFile = file;
+
+    fileName.textContent = file.name;
+
+    fileSize.textContent =
+      `${(file.size / 1024 / 1024).toFixed(2)} MB`;
+
+    fileInfo.classList.add("visible");
+
+    splitButton.disabled = false;
+
+    message.className = "message";
+  }
+
+  input.addEventListener("change", () => {
+    selectFile(input.files[0]);
+    input.value = "";
+  });
+
+  // --------------------------------
+  // DRAG AND DROP
+  // --------------------------------
+
+  ["dragenter", "dragover"].forEach(eventName => {
+    dropZone.addEventListener(eventName, event => {
+      event.preventDefault();
+      dropZone.classList.add("dragover");
+    });
+  });
+
+  ["dragleave", "drop"].forEach(eventName => {
+    dropZone.addEventListener(eventName, event => {
+      event.preventDefault();
+      dropZone.classList.remove("dragover");
+    });
+  });
+
+  dropZone.addEventListener("drop", event => {
+    const file = event.dataTransfer.files[0];
+    selectFile(file);
+  });
+
+  // --------------------------------
+  // EXTRACT PDF PAGES
+  // --------------------------------
+
+  splitButton.addEventListener("click", async () => {
+
+    if (!selectedFile) {
+      showMessage("Please select a PDF file first.", "error");
+      return;
+    }
+
+    const pages = pagesInput.value.trim();
+
+    if (!pages) {
+      showMessage(
+        "Please enter the page numbers you want to extract.",
+        "error"
+      );
+      return;
+    }
+
+    // Validate the page expression before sending
+    const validFormat =
+      /^\d+(\s*-\s*\d+)?(\s*,\s*\d+(\s*-\s*\d+)?)*$/.test(pages);
+
+    if (!validFormat) {
+      showMessage(
+        "Invalid page format. Try an example such as 1, 3, 5-8.",
+        "error"
+      );
+      return;
+    }
+
+    const formData = new FormData();
+
+    formData.append("file", selectedFile);
+    formData.append("pages", pages);
+
+    splitButton.disabled = true;
+    splitButton.textContent = "Extracting...";
+
+    message.className = "message";
+
+    try {
+
+      const response = await fetch(
+        `${API_BASE}/api/split-pdf`,
+        {
+          method: "POST",
+          body: formData
+        }
+      );
+
+      const result = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(
+          result.detail || "PDF extraction failed."
+        );
+      }
+
+      showMessage(
+        result.message || "Your selected pages are ready.",
+        "success"
+      );
+
+      const downloadLink = document.createElement("a");
+
+      downloadLink.className = "download-link";
+
+      downloadLink.href =
+        `${API_BASE}${result.download_url}`;
+
+      downloadLink.textContent = "Download extracted PDF";
+
+      downloadLink.download =
+        result.filename || "extracted-pages.pdf";
+
+      message.appendChild(downloadLink);
+
+    } catch (error) {
+
+      showMessage(
+        error.message ||
+        "Could not connect to the PDFKit backend.",
+        "error"
+      );
+
+    } finally {
+
+      splitButton.disabled = !selectedFile;
+      splitButton.textContent = "Extract Pages →";
+
+    }
+
+  });
+
+  // --------------------------------
+  // MOBILE SIDEBAR
+  // --------------------------------
+
+  const menuToggle = document.getElementById("menuToggle");
+  const sidebar = document.getElementById("sidebar");
+
+  if (menuToggle && sidebar) {
+
+    menuToggle.addEventListener("click", () => {
+      const open = sidebar.classList.toggle("open");
+
+      menuToggle.setAttribute(
+        "aria-expanded",
+        String(open)
+      );
+    });
+
+    document.addEventListener("click", event => {
+      if (
+        window.innerWidth <= 900 &&
+        sidebar.classList.contains("open") &&
+        !sidebar.contains(event.target) &&
+        !menuToggle.contains(event.target)
+      ) {
+        sidebar.classList.remove("open");
+
+        menuToggle.setAttribute(
+          "aria-expanded",
+          "false"
+        );
+      }
+    });
+  }
+
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Convert JPG and PNG images into a PDF with PDFKit.">
+  <meta name="theme-color" content="#f7f8fc">
+  <title>Image to PDF — PDFKit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .tool-main { max-width: 1040px; margin: 0 auto; padding: 38px 42px 60px; }
+    .tool-breadcrumb { color: #8a8fa1; font-size: 12px; margin-bottom: 25px; }
+    .tool-breadcrumb a { color: #6558e8; font-weight: 700; }
+    .tool-intro { margin-bottom: 28px; }
+    .tool-intro .eyebrow { color: #6558e8; font-size: 10px; font-weight: 700; letter-spacing: 1.4px; }
+    .tool-intro h1 { margin: 10px 0 8px; font: 800 clamp(27px,4vw,37px) 'Manrope',sans-serif; letter-spacing: -1.3px; }
+    .tool-intro p { max-width: 650px; margin: 0; color: #777d91; font-size: 14px; line-height: 1.7; }
+    .converter-card { max-width: 760px; padding: 28px; border: 1px solid #eceef4; border-radius: 16px; background: white; box-shadow: 0 12px 34px rgba(31,37,72,.055); }
+    .drop-zone { display: grid; place-items: center; min-height: 245px; padding: 28px; border: 1.5px dashed #c9c5f5; border-radius: 13px; background: #faf9ff; text-align: center; cursor: pointer; transition: .2s ease; }
+    .drop-zone.dragover { border-color: #6558e8; background: #f2f0ff; }
+    .upload-symbol { width: 52px; height: 52px; display: grid; place-items: center; margin-bottom: 14px; border-radius: 15px; background: #eeecff; color: #6558e8; font-size: 25px; }
+    .drop-zone strong { color: #25283a; font: 700 15px 'Manrope',sans-serif; }
+    .drop-zone p { margin: 7px 0 13px; color: #858a9b; font-size: 12px; }
+    .browse-button { display: inline-flex; align-items: center; min-height: 37px; padding: 0 16px; border: 0; border-radius: 8px; background: #6558e8; color: white; font-size: 12px; font-weight: 700; cursor: pointer; }
+    .file-rules { margin-top: 12px; color: #999eac; font-size: 11px; }
+    #imageInput { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+    .selected-heading { display:flex; justify-content:space-between; align-items:center; margin: 23px 0 10px; color:#34384b; font-size:12px; font-weight:700; }
+    .selected-heading button { border:0; background:none; color:#d05d68; font-size:11px; font-weight:700; cursor:pointer; }
+    .file-list { display:grid; gap:8px; }
+    .file-item { display:flex; align-items:center; gap:11px; padding:11px 12px; border:1px solid #eceef4; border-radius:9px; }
+    .file-badge { width:34px; height:36px; display:grid; place-items:center; flex:none; border-radius:7px; background:#f0efff; color:#6558e8; font-size:10px; font-weight:800; }
+    .file-info { min-width:0; flex:1; }
+    .file-info strong { display:block; overflow:hidden; color:#34384b; font-size:11px; text-overflow:ellipsis; white-space:nowrap; }
+    .file-info small { color:#999eac; font-size:10px; }
+    .remove-file { border:0; background:none; color:#9a9eac; font-size:19px; cursor:pointer; }
+    .convert-row { display:flex; align-items:center; gap:15px; margin-top:22px; }
+    .convert-button { min-height:45px; padding:0 22px; border:0; border-radius:9px; background:#6558e8; color:white; font-size:12px; font-weight:700; cursor:pointer; box-shadow:0 6px 14px #6558e82b; }
+    .convert-button:hover { background:#5144d5; }
+    .convert-button:disabled { opacity:.55; cursor:not-allowed; box-shadow:none; }
+    .helper-text { color:#999eac; font-size:11px; }
+    .message { display:none; margin-top:17px; padding:12px 14px; border-radius:9px; font-size:12px; line-height:1.55; }
+    .message.visible { display:block; }
+    .message.error { color:#a63f4a; background:#fff1f2; border:1px solid #f7dadd; }
+    .message.success { color:#137c5b; background:#edfaf5; border:1px solid #d1f0e3; }
+    .download-link { display:inline-block; margin-left:7px; color:inherit; font-weight:800; text-decoration:underline; }
+    @media(max-width:700px) { .tool-main { padding:25px 18px 45px; } .converter-card { padding:17px; } .drop-zone { min-height:220px; } .convert-row { align-items:flex-start; flex-direction:column; } }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="index.html" aria-label="PDFKit home">
+        <span class="brand-mark"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M8 3.5h10l7 7V28H8a3 3 0 0 1-3-3V6.5a3 3 0 0 1 3-3Z"/><path d="M18 3.5v7h7M10 17h12M10 21h12M10 13h4"/></svg></span>
+        <span>PDF<span class="brand-accent">Kit</span></span>
+      </a>
+      <div class="side-label">WORKSPACE</div>
+      <nav class="side-nav" aria-label="Main navigation">
+        <a class="nav-item" href="index.html#home"><span class="nav-icon">⌂</span> Overview</a>
+        <a class="nav-item" href="index.html#tools"><span class="nav-icon">▦</span> All PDF tools</a>
+        <a class="nav-item" href="index.html#history"><span class="nav-icon">◷</span> Recent activity</a>
+      </nav>
+      <div class="side-label side-label-tools">YOUR TOOLS</div>
+      <nav class="side-nav" aria-label="PDF tools">
+        <a class="nav-item active" href="image-to-pdf.html"><span class="tool-dot purple">▧</span> Image to PDF</a>
+        <a class="nav-item" href="merge-pdf.html"><span class="tool-dot blue">▤</span> Merge PDF</a>
+        <a class="nav-item" href="split-pdf.html"><span class="tool-dot orange">⫶</span> Split PDF</a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="help-card"><div class="help-icon">✦</div><strong>Simple by design</strong><p>Convert your images into one PDF document in a few steps.</p><a href="index.html#tools">Explore tools <span>→</span></a></div>
+        <div class="sidebar-foot"><span class="status-dot"></span> PDFKit workspace</div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <button class="mobile-menu" id="menuToggle" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+        <div class="breadcrumb">Workspace <span>/</span> <strong>Image to PDF</strong></div>
+        <div class="topbar-right"><span class="secure-note"><span>✧</span> Simple. Secure. Efficient.</span><div class="avatar" aria-label="Guest user">G</div></div>
+      </header>
+
+      <div class="tool-main">
+        <div class="tool-breadcrumb"><a href="index.html">Workspace</a> / Image to PDF</div>
+        <section class="tool-intro">
+          <div class="eyebrow">IMAGE CONVERSION</div>
+          <h1>Turn images into a PDF.</h1>
+          <p>Select one or more JPG, JPEG, or PNG images. PDFKit will combine them into a single PDF, keeping the order shown below.</p>
+        </section>
+
+        <section class="converter-card" aria-label="Image to PDF converter">
+          <label class="drop-zone" id="dropZone" for="imageInput">
+            <span class="upload-symbol">↑</span>
+            <strong>Drop your images here</strong>
+            <p>or choose files from your device</p>
+            <span class="browse-button">Browse images</span>
+            <span class="file-rules">JPG, JPEG and PNG · Up to 20 MB per image · Maximum 15 images</span>
+          </label>
+          <input id="imageInput" type="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png" multiple>
+          <div class="selected-heading"><span id="selectionLabel">Selected images (0)</span><button type="button" id="clearFiles" hidden>Clear all</button></div>
+          <div class="file-list" id="fileList" aria-live="polite"></div>
+          <div class="convert-row">
+            <button class="convert-button" id="convertButton" type="button" disabled>Convert to PDF <span aria-hidden="true">→</span></button>
+            <span class="helper-text">Your files are processed by the local PDFKit backend.</span>
+          </div>
+          <div class="message" id="message" role="status" aria-live="polite"></div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      "use strict";
+      const API_BASE = "http://127.0.0.1:8000";
+      const input = document.getElementById("imageInput");
+      const dropZone = document.getElementById("dropZone");
+      const fileList = document.getElementById("fileList");
+      const selectionLabel = document.getElementById("selectionLabel");
+      const clearButton = document.getElementById("clearFiles");
+      const convertButton = document.getElementById("convertButton");
+      const message = document.getElementById("message");
+      let selectedFiles = [];
+
+      function humanSize(bytes) {
+        return bytes < 1024 * 1024
+          ? `${(bytes / 1024).toFixed(0)} KB`
+          : `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+      }
+
+      function showMessage(text, kind) {
+        message.className = `message visible ${kind}`;
+        message.textContent = text;
+      }
+
+      function addFiles(fileCollection) {
+        const incoming = Array.from(fileCollection || []);
+        const valid = incoming.filter((file) => {
+          const extensionOk = /\.(jpe?g|png)$/i.test(file.name);
+          const typeOk = ["image/jpeg", "image/png"].includes(file.type);
+          return extensionOk && typeOk && file.size <= 20 * 1024 * 1024;
+        });
+
+        if (valid.length !== incoming.length) {
+          showMessage("Some files were skipped. Choose JPG, JPEG or PNG images up to 20 MB each.", "error");
+        } else {
+          message.className = "message";
+        }
+
+        const combined = [...selectedFiles];
+        valid.forEach((file) => {
+          if (!combined.some((existing) => existing.name === file.name && existing.size === file.size && existing.lastModified === file.lastModified)) {
+            combined.push(file);
+          }
+        });
+
+        if (combined.length > 15) {
+          showMessage("You can select a maximum of 15 images per conversion.", "error");
+          selectedFiles = combined.slice(0, 15);
+        } else {
+          selectedFiles = combined;
+        }
+        renderFiles();
+      }
+
+      function renderFiles() {
+        fileList.replaceChildren();
+        selectionLabel.textContent = `Selected images (${selectedFiles.length})`;
+        clearButton.hidden = selectedFiles.length === 0;
+        convertButton.disabled = selectedFiles.length === 0;
+
+        selectedFiles.forEach((file, index) => {
+          const item = document.createElement("div");
+          item.className = "file-item";
+          const badge = document.createElement("span");
+          badge.className = "file-badge";
+          badge.textContent = file.name.split(".").pop().toUpperCase();
+          const info = document.createElement("div");
+          info.className = "file-info";
+          const name = document.createElement("strong");
+          name.textContent = `${index + 1}. ${file.name}`;
+          const size = document.createElement("small");
+          size.textContent = humanSize(file.size);
+          info.append(name, size);
+          const remove = document.createElement("button");
+          remove.className = "remove-file";
+          remove.type = "button";
+          remove.setAttribute("aria-label", `Remove ${file.name}`);
+          remove.textContent = "×";
+          remove.addEventListener("click", () => {
+            selectedFiles.splice(index, 1);
+            renderFiles();
+          });
+          item.append(badge, info, remove);
+          fileList.appendChild(item);
+        });
+      }
+
+      input.addEventListener("change", () => {
+        addFiles(input.files);
+        input.value = "";
+      });
+
+      ["dragenter", "dragover"].forEach((eventName) => {
+        dropZone.addEventListener(eventName, (event) => {
+          event.preventDefault();
+          dropZone.classList.add("dragover");
+        });
+      });
+      ["dragleave", "drop"].forEach((eventName) => {
+        dropZone.addEventListener(eventName, (event) => {
+          event.preventDefault();
+          dropZone.classList.remove("dragover");
+        });
+      });
+      dropZone.addEventListener("drop", (event) => addFiles(event.dataTransfer.files));
+
+      clearButton.addEventListener("click", () => {
+        selectedFiles = [];
+        renderFiles();
+        message.className = "message";
+      });
+
+      convertButton.addEventListener("click", async () => {
+        if (!selectedFiles.length) return;
+        const body = new FormData();
+        selectedFiles.forEach((file) => body.append("files", file));
+        convertButton.disabled = true;
+        convertButton.textContent = "Converting…";
+        message.className = "message";
+        try {
+          const response = await fetch(`${API_BASE}/api/image-to-pdf`, { method: "POST", body });
+          const result = await response.json().catch(() => ({}));
+          if (!response.ok) {
+            const detail = result.detail || "Conversion failed. Please check your files and try again.";
+            throw new Error(Array.isArray(detail) ? detail.map((item) => item.msg || String(item)).join(", ") : detail);
+          }
+          showMessage(result.message || "Your PDF is ready.", "success");
+          const link = document.createElement("a");
+          link.className = "download-link";
+          link.href = `${API_BASE}${result.download_url}`;
+          link.textContent = "Download PDF";
+          link.setAttribute("download", result.filename || "pdfkit.pdf");
+          message.appendChild(link);
+        } catch (error) {
+          showMessage(error.message || "Could not connect to the PDFKit backend. Make sure the server is running.", "error");
+        } finally {
+          convertButton.disabled = selectedFiles.length === 0;
+          convertButton.innerHTML = 'Convert to PDF <span aria-hidden="true">→</span>';
+        }
+      });
+
+      const menuToggle = document.getElementById("menuToggle");
+      const sidebar = document.getElementById("sidebar");
+      if (menuToggle && sidebar) {
+        menuToggle.addEventListener("click", () => {
+          const open = sidebar.classList.toggle("open");
+          menuToggle.setAttribute("aria-expanded", String(open));
+        });
+        document.addEventListener("click", (event) => {
+          if (window.innerWidth <= 900 && sidebar.classList.contains("open") &&
+              !sidebar.contains(event.target) && !menuToggle.contains(event.target)) {
+            sidebar.classList.remove("open");
+            menuToggle.setAttribute("aria-expanded", "false");
+          }
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

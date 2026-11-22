@@ -1,0 +1,806 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>PDFKit — PDF Tools & Management</title>
+
+    <meta name="description"
+          content="PDFKit is a web-based PDF conversion and management system. Convert images to PDF, merge PDF files, and extract pages easily.">
+
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+
+<div class="app-container">
+
+    <!-- =====================================
+         SIDEBAR
+    ====================================== -->
+
+    <aside class="sidebar" id="sidebar">
+
+        <div class="sidebar-header">
+
+            <a href="index.html" class="brand">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-file-pdf"></i>
+                </div>
+
+                <div class="brand-text">
+                    <span class="brand-name">PDFKit</span>
+                    <span class="brand-tagline">PDF MANAGEMENT</span>
+                </div>
+            </a>
+
+            <button class="sidebar-close" id="sidebar-close"
+                    aria-label="Close navigation">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+        </div>
+
+
+        <div class="sidebar-content">
+
+            <div class="nav-section">
+
+                <p class="nav-heading">WORKSPACE</p>
+
+                <a href="index.html" class="nav-link active">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Overview</span>
+                </a>
+
+                <a href="#pdf-tools" class="nav-link">
+                    <i class="fa-solid fa-toolbox"></i>
+                    <span>All PDF Tools</span>
+                </a>
+
+                <a href="#recent-activity-section" class="nav-link">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    <span>Recent Activity</span>
+                </a>
+
+            </div>
+
+
+            <div class="nav-section">
+
+                <p class="nav-heading">PDF TOOLS</p>
+
+                <a href="image-to-pdf.html" class="nav-link">
+                    <i class="fa-solid fa-images"></i>
+                    <span>Image to PDF</span>
+                </a>
+
+                <a href="merge-pdf.html" class="nav-link">
+                    <i class="fa-solid fa-object-group"></i>
+                    <span>Merge PDF</span>
+                </a>
+
+                <a href="split-pdf.html" class="nav-link">
+                    <i class="fa-solid fa-scissors"></i>
+                    <span>Split PDF</span>
+                </a>
+
+            </div>
+
+
+            <div class="nav-section">
+
+                <p class="nav-heading">INFORMATION</p>
+
+                <a href="#how-it-works" class="nav-link">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span>How It Works</span>
+                </a>
+
+                <a href="#about-pdfkit" class="nav-link">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <span>About PDFKit</span>
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- Backend status -->
+
+        <div class="sidebar-footer">
+
+            <div class="connection-card">
+
+                <div class="connection-indicator">
+                    <span class="status-dot" id="backend-status-dot"></span>
+                </div>
+
+                <div class="connection-details">
+                    <span class="connection-title">Backend Status</span>
+                    <span class="connection-status" id="backend-status">
+                        Checking connection...
+                    </span>
+                </div>
+
+            </div>
+
+            <div class="sidebar-footer-text">
+                <span>PDFKit</span>
+                <span>Version 1.0.0</span>
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- Mobile sidebar overlay -->
+
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+
+    <!-- =====================================
+         MAIN CONTENT
+    ====================================== -->
+
+    <main class="main-content">
+
+        <!-- TOP HEADER -->
+
+        <header class="topbar">
+
+            <div class="topbar-left">
+
+                <button class="menu-toggle" id="menu-toggle"
+                        aria-label="Open navigation">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+
+                <div class="breadcrumb">
+                    <span>Workspace</span>
+                    <i class="fa-solid fa-chevron-right"></i>
+                    <strong>Overview</strong>
+                </div>
+
+            </div>
+
+
+            <div class="topbar-right">
+
+                <div class="topbar-date">
+                    <i class="fa-regular fa-calendar"></i>
+                    <span id="current-date">PDFKit Workspace</span>
+                </div>
+
+                <div class="user-avatar" title="PDFKit User">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- =====================================
+             DASHBOARD OVERVIEW
+        ====================================== -->
+
+        <div class="page-content">
+
+
+            <!-- WELCOME SECTION -->
+
+            <section class="welcome-section">
+
+                <div class="welcome-content">
+
+                    <div class="welcome-label">
+                        <span class="welcome-label-dot"></span>
+                        YOUR PDF WORKSPACE
+                    </div>
+
+                    <h1>
+                        Manage your PDFs.<br>
+                        <span>Simply and efficiently.</span>
+                    </h1>
+
+                    <p>
+                        Everything you need to convert, combine, and organize
+                        PDF documents — all in one convenient workspace.
+                    </p>
+
+                    <div class="welcome-actions">
+
+                        <a href="#pdf-tools" class="btn btn-primary">
+                            Explore PDF Tools
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+
+                        <a href="#how-it-works" class="btn btn-secondary">
+                            <i class="fa-regular fa-circle-play"></i>
+                            How It Works
+                        </a>
+
+                    </div>
+
+                </div>
+
+
+                <div class="welcome-visual">
+
+                    <div class="visual-decoration visual-decoration-one"></div>
+                    <div class="visual-decoration visual-decoration-two"></div>
+
+                    <div class="document-illustration">
+
+                        <div class="document-back">
+                            <i class="fa-solid fa-file-pdf"></i>
+                        </div>
+
+                        <div class="document-front">
+
+                            <div class="document-icon">
+                                <i class="fa-solid fa-file-pdf"></i>
+                            </div>
+
+                            <div class="document-lines">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+
+                            <div class="document-label">
+                                PDF DOCUMENT
+                            </div>
+
+                        </div>
+
+                        <div class="floating-icon floating-image">
+                            <i class="fa-solid fa-image"></i>
+                        </div>
+
+                        <div class="floating-icon floating-merge">
+                            <i class="fa-solid fa-object-group"></i>
+                        </div>
+
+                        <div class="floating-icon floating-check">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =====================================
+                 QUICK STATISTICS
+            ====================================== -->
+
+            <section class="stats-grid">
+
+                <div class="stat-card">
+
+                    <div class="stat-icon stat-icon-purple">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    </div>
+
+                    <div class="stat-info">
+                        <span class="stat-label">Available Tools</span>
+                        <h2>03</h2>
+                        <span class="stat-description">
+                            PDF processing tools
+                        </span>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon stat-icon-blue">
+                        <i class="fa-solid fa-file-arrow-up"></i>
+                    </div>
+
+                    <div class="stat-info">
+                        <span class="stat-label">Supported Formats</span>
+                        <h2>04</h2>
+                        <span class="stat-description">
+                            PDF, JPG, JPEG and PNG
+                        </span>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon stat-icon-green">
+                        <i class="fa-solid fa-database"></i>
+                    </div>
+
+                    <div class="stat-info">
+                        <span class="stat-label">Processing History</span>
+                        <h2 id="total-operations">--</h2>
+                        <span class="stat-description">
+                            Recorded operations
+                        </span>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon stat-icon-orange">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+
+                    <div class="stat-info">
+                        <span class="stat-label">Account Required</span>
+                        <h2>No</h2>
+                        <span class="stat-description">
+                            Use tools without registration
+                        </span>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =====================================
+                 PDF TOOLS
+            ====================================== -->
+
+            <section class="content-section" id="pdf-tools">
+
+                <div class="section-header">
+
+                    <div>
+                        <span class="section-eyebrow">TOOLS & FEATURES</span>
+                        <h2>What would you like to do?</h2>
+                        <p>
+                            Choose a tool to get started with your PDF task.
+                        </p>
+                    </div>
+
+                    <span class="tool-count">
+                        3 TOOLS AVAILABLE
+                    </span>
+
+                </div>
+
+
+                <div class="tools-grid">
+
+
+                    <!-- IMAGE TO PDF -->
+
+                    <article class="tool-card">
+
+                        <div class="tool-card-top">
+
+                            <div class="tool-icon tool-icon-purple">
+                                <i class="fa-solid fa-images"></i>
+                            </div>
+
+                            <span class="tool-badge">CONVERSION</span>
+
+                        </div>
+
+                        <div class="tool-card-content">
+
+                            <h3>Image to PDF</h3>
+
+                            <p>
+                                Convert multiple images into a single PDF
+                                document. Upload JPG, JPEG, or PNG images
+                                and create a downloadable PDF file.
+                            </p>
+
+                            <div class="tool-features">
+
+                                <span>
+                                    <i class="fa-solid fa-check"></i>
+                                    Multiple images
+                                </span>
+
+                                <span>
+                                    <i class="fa-solid fa-check"></i>
+                                    JPG, JPEG and PNG
+                                </span>
+
+                                <span>
+                                    <i class="fa-solid fa-check"></i>
+                                    Single PDF output
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <a href="image-to-pdf.html" class="tool-action">
+                            Open Image to PDF
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+
+                    </article>
+
+
+
+                    <!-- MERGE PDF -->
+
+                    <article class="tool-card">
+
+                        <div class="tool-card-top">
+
+                            <div class="tool-icon tool-icon-blue">
+                                <i class="fa-solid fa-object-group"></i>
+                            </div>
+
+                            <span class="tool-badge">ORGANIZATION</span>
+
+                        </div>
+
+                        <div class="tool-card-content">
+
+                            <h3>Merge PDF</h3>
+
+                            <p>
+                                Combine two or more PDF documents into
+                                one organized file. Upload your documents
+                                and create a single merged PDF.
+                            </p>
+
+                            <div class="tool-features">
+
+                                <span>
+                                    <i class="fa-solid fa-check"></i>
+                                    Combine multiple PDFs
+                                </span>
+
+                                <span>
+                                    <i class="fa-solid fa-check"></i>
+                                    Preserve page order
+                                </span>
+
+                                <span>
+                                    <i class="fa-solid fa-check"></i>
+                                    Download merged file
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <a href="merge-pdf.html" class="tool-action">
+                            Open Merge PDF
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+
+                    </article>
+
+
+
+                    <!-- SPLIT PDF -->
+
+                    <article class="tool-card">
+
+                        <div class="tool-card-top">
+
+                            <div class="tool-icon tool-icon-orange">
+                                <i class="fa-solid fa-scissors"></i>
+                            </div>
+
+                            <span class="tool-badge">PAGE MANAGEMENT</span>
+
+                        </div>
+
+                        <div class="tool-card-content">
+
+                            <h3>Split PDF</h3>
+
+                            <p>
+                                Extract selected pages from a PDF document.
+                                Specify individual page numbers or page
+                                ranges to create a new PDF.
+                            </p>
+
+                            <div class="tool-features">
+
+                                <span>
+                                    <i class="fa-solid fa-check"></i>
+                                    Select specific pages
+                                </span>
+
+                                <span>
+                                    <i class="fa-solid fa-check"></i>
+                                    Extract page ranges
+                                </span>
+
+                                <span>
+                                    <i class="fa-solid fa-check"></i>
+                                    New PDF output
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <a href="split-pdf.html" class="tool-action">
+                            Open Split PDF
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+
+                    </article>
+
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =====================================
+                 RECENT ACTIVITY
+            ====================================== -->
+
+            <section class="content-section"
+                     id="recent-activity-section">
+
+                <div class="section-header">
+
+                    <div>
+                        <span class="section-eyebrow">YOUR WORKSPACE</span>
+                        <h2>Recent Activity</h2>
+                        <p>
+                            Review your latest PDF processing operations.
+                        </p>
+                    </div>
+
+                    <button class="refresh-button" id="refresh-history"
+                            type="button">
+                        <i class="fa-solid fa-rotate"></i>
+                        Refresh
+                    </button>
+
+                </div>
+
+
+                <div class="activity-card">
+
+                    <div class="activity-table-wrapper">
+
+                        <table class="activity-table">
+
+                            <thead>
+                                <tr>
+                                    <th>OPERATION</th>
+                                    <th>FILE NAME</th>
+                                    <th>DATE & TIME</th>
+                                    <th>STATUS</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="recent-activity">
+
+                                <tr>
+                                    <td colspan="4" class="empty-activity">
+                                        <div class="empty-activity-icon">
+                                            <i class="fa-solid fa-clock-rotate-left"></i>
+                                        </div>
+
+                                        <strong>Loading activity...</strong>
+
+                                        <span>
+                                            Your recent PDF operations will
+                                            appear here.
+                                        </span>
+                                    </td>
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+
+                    <div class="activity-footer">
+                        <span>
+                            <i class="fa-solid fa-circle-info"></i>
+                            Activity is stored locally in the PDFKit database.
+                        </span>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =====================================
+                 HOW IT WORKS
+            ====================================== -->
+
+            <section class="content-section" id="how-it-works">
+
+                <div class="section-header">
+
+                    <div>
+                        <span class="section-eyebrow">SIMPLE PROCESS</span>
+                        <h2>How PDFKit works</h2>
+                        <p>
+                            Complete your PDF tasks in three simple steps.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="steps-grid">
+
+                    <div class="step-card">
+
+                        <div class="step-number">01</div>
+
+                        <div class="step-icon">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                        </div>
+
+                        <h3>Upload your files</h3>
+
+                        <p>
+                            Select the images or PDF documents you want
+                            to process from your device.
+                        </p>
+
+                    </div>
+
+
+                    <div class="step-card">
+
+                        <div class="step-number">02</div>
+
+                        <div class="step-icon">
+                            <i class="fa-solid fa-gears"></i>
+                        </div>
+
+                        <h3>Process your files</h3>
+
+                        <p>
+                            Choose your desired operation. PDFKit
+                            processes your files through its backend.
+                        </p>
+
+                    </div>
+
+
+                    <div class="step-card">
+
+                        <div class="step-number">03</div>
+
+                        <div class="step-icon">
+                            <i class="fa-solid fa-download"></i>
+                        </div>
+
+                        <h3>Download the result</h3>
+
+                        <p>
+                            Download your newly generated PDF document
+                            when processing is complete.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =====================================
+                 ABOUT PDFKIT
+            ====================================== -->
+
+            <section class="about-section" id="about-pdfkit">
+
+                <div class="about-icon">
+                    <i class="fa-solid fa-file-pdf"></i>
+                </div>
+
+                <div class="about-content">
+
+                    <span class="section-eyebrow">ABOUT THE PROJECT</span>
+
+                    <h2>Meet PDFKit</h2>
+
+                    <p>
+                        PDFKit is a web-based PDF conversion and management
+                        system designed to make common document operations
+                        simple and accessible. It provides image-to-PDF
+                        conversion, PDF merging, and page extraction
+                        through a clean and responsive interface.
+                    </p>
+
+                    <p>
+                        The application uses a Python FastAPI backend,
+                        SQLite for operation history, Pillow for image
+                        processing, and pypdf for PDF manipulation.
+                    </p>
+
+                    <div class="about-tags">
+                        <span>FastAPI</span>
+                        <span>Python</span>
+                        <span>SQLite</span>
+                        <span>pypdf</span>
+                        <span>Pillow</span>
+                        <span>HTML / CSS / JavaScript</span>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =====================================
+                 FOOTER
+            ====================================== -->
+
+            <footer class="main-footer">
+
+                <div class="footer-left">
+
+                    <div class="footer-brand">
+                        <i class="fa-solid fa-file-pdf"></i>
+                        <strong>PDFKit</strong>
+                    </div>
+
+                    <span>
+                        A simple workspace for PDF conversion and management.
+                    </span>
+
+                </div>
+
+
+                <div class="footer-right">
+
+                    <span>Software Engineering Lab Project</span>
+                    <span class="footer-separator">•</span>
+                    <span>Version 1.0.0</span>
+
+                </div>
+
+            </footer>
+
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<!-- JavaScript -->
+
+<script src="app.js"></script>
+
+</body>
+</html>
